@@ -1,0 +1,104 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{mathtools}
+
+\newtheorem{theorem}{Theorem}
+
+\title{Double integrator with state and input constraints}
+\author{Daniel Ricketts}
+
+\newcommand{\vecbold}[1]{\boldsymbol{#1}}
+\newcommand{\umin}{u_{min}}
+\newcommand{\p}{\gamma}
+\newcommand{\q}{\alpha}
+
+\begin{document}
+\maketitle
+
+\section{Problem}
+Consider the following double integrator:
+\begin{align}
+\begin{split}
+\dot{x} &= v \\
+\dot{v} &= u
+\end{split}
+\label{sys1}
+\end{align}
+
+where
+\[
+u \leq
+\begin{cases}
+-\q(v - \sqrt{2\umin(-x + \frac{\umin}{2\p^2})}) - \frac{\umin v}{\sqrt{2\umin(-x + \frac{\umin}{2\p^2})}} & \text{if } x < \frac{\umin}{\p^2}\\
+-(\q + \p) v -\q\p x & \text{otherwise}
+\end{cases}
+\]
+
+We want to prove that this system satisfies the state constraint $x \leq 0$
+while obeying the input constraint $u \geq \umin$ where $\umin < 0$, under
+the assumption that $x \leq 0$ and $B(x,v) \leq 0$ hold on the initial
+state, where
+
+\[B(x,v) =
+\begin{cases}
+v - \sqrt{2\umin(-x + \frac{\umin}{2\p^2})} & \text{if } x < \frac{\umin}{\p^2}\\
+v + \p x & \text{otherwise}
+\end{cases}
+\]
+for some constant $\p > 0$.
+
+\section{Proof}
+This proof proceeds in two steps:
+\begin{enumerate}
+\item Use the barrier function theorem to show that $B(x,v) \leq 0$ is an invariant of the system.
+\item Use the above invariant to show that $x \leq 0$ is an invariant of the system.
+\end{enumerate}
+
+\paragraph*{Step 1}
+The Lie derivative of $B(x,v)$ is as follows:
+\[\dot{B}(x,v) =
+\begin{cases}
+u + \frac{\umin v}{\sqrt{2\umin(-x + \frac{\umin}{2\p^2})}} & \text{if } x < \frac{\umin}{\p^2}\\
+u + \p v & \text{otherwise}
+\end{cases}
+\]
+
+Applying the exponential barrier certificate theorem results in the following constraints on $u$:
+\[
+u \leq
+\begin{cases}
+-\q(v - \sqrt{2\umin(-x + \frac{\umin}{2\p^2})}) - \frac{\umin v}{\sqrt{2\umin(-x + \frac{\umin}{2\p^2})}} & \text{if } x < \frac{\umin}{\p^2}\\
+-(\q + \p) v -\q\p x & \text{otherwise}
+\end{cases}
+\]
+
+We have division by a variable in the first branch of the piecewise function, but due to
+the condition on that branch ($x < \frac{\umin}{\p^2}$), the denominator is
+at least $\frac{|\umin|}{p} > 0$, so that term is bounded.
+
+\paragraph*{Step 2}
+
+
+\section{Exponential barrier functions}
+The proof uses a general theorem about barrier functions. A barrier
+function is a scalar function along trajectories of the system that is used
+to establish an invariant. This particular flavor of barrier functions
+establishes invariants of the form $B(\vecbold{x}) \leq 0$ where $B$ is the
+barrier function. The theorem states that such a predicate is an invariant
+of the system if the value of $B$ along trajectories of the system
+approaches the boundary of the invariant no faster than an
+exponential. More precisely:
+
+\begin{theorem}
+For an $n$-dimensional system, if there exists a function $B \in \mathcal{R}^n \rightarrow \mathcal{R}$ and some constant $\lambda \in \mathcal{R}$ such that
+\[\dot{B}(\vecbold{x}) \leq \lambda B(\vecbold{x})\]
+then the set $\{\vecbold{x} \in \mathcal{R}^n : B(\vecbold{x}) \leq 0\}$ is forward invariant. In other words, along all trajectories of the system $\vecbold{x}(t)$, if $B(\vecbold{x}(0)) \leq 0$, then $\forall t \geq 0, B(\vecbold{x}(t)) \leq 0$.
+\label{thm:exp-barrier}
+\end{theorem}
+
+In this theorem, $\dot{B}(\vecbold{x})$ is the derivative of $B$ with
+respect to time along trajectories of the system, also known as the Lie
+derivative.
+
+\end{document}

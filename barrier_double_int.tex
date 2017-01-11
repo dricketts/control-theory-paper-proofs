@@ -1,0 +1,72 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+
+\newtheorem{theorem}{Theorem}
+
+\title{Safety proof for double integrator}
+\author{Daniel Ricketts}
+
+\newcommand{\vecbold}[1]{\boldsymbol{#1}}
+\newcommand{\umin}{u_{min}}
+
+\begin{document}
+\maketitle
+
+\section{Problem}
+We have a continuous two dimensional system with control input $u$:
+\begin{align}
+\dot{x} &= v \\
+\dot{v} &= u
+\end{align}
+We want to show that $u \leq -2v-x$ enforces the invariant $x \leq 0$.
+
+\section{Exponential barrier functions}
+The proof uses a general theorem about barrier functions. A barrier
+function is a scalar function along trajectories of the system that is used
+to establish an invariant. This particular flavor of barrier functions
+establishes invariants of the form $B(\vecbold{x}) \leq 0$ where $B$ is the
+barrier function. The theorem states that such a predicate is an invariant
+of the system if the value of $B$ along trajectories of the system
+approaches the boundary of the invariant no faster than an
+exponential. More precisely:
+
+\begin{theorem}
+For an $n$-dimensional system, if there exists a function $B \in \mathcal{R}^n \rightarrow \mathcal{R}$ and some constant $\lambda \in \mathcal{R}$ such that
+\[\dot{B}(\vecbold{x}) \leq \lambda B(\vecbold{x})\]
+then the set $\{\vecbold{x} \in \mathcal{R}^n : B(\vecbold{x}) \leq 0\}$ is forward invariant. In other words, along all trajectories of the system $\vecbold{x}(t)$, if $B(\vecbold{x}(0)) \leq 0$, then $\forall t \geq 0, B(\vecbold{x}(t)) \leq 0$.
+\label{thm:exp-barrier}
+\end{theorem}
+
+In this theorem, $\dot{B}(\vecbold{x})$ is the derivative of $B$ with
+respect to time along trajectories of the system, also known as the Lie
+derivative.
+
+\section{Proof}
+The high level proof consists of two steps:
+\begin{enumerate}
+\item Use Theorem~\ref{thm:exp-barrier} to prove that $v \leq -x$ is an invariant of the system.
+\item Use Theorem~\ref{thm:exp-barrier} and the invariance of $v \leq -x$ to prove invariance of $x \leq 0$.
+\end{enumerate}
+
+\paragraph*{Proof of 1:}
+Apply Theorem~\ref{thm:exp-barrier} with $B(x,v) = v + x$. This leaves us
+to prove $\dot{B}(x,v) = u + v <= \lambda (v + x)$ for some $\lambda \in
+\mathcal{R}$. Setting $\lambda = -1$ results in the contraint $u <= -2v -
+x$. This is exactly the constraint we impose on $u$.
+
+\paragraph*{Proof of 2:}
+Apply Theorem~\ref{thm:exp-barrier} with $B(x,v) = x$. This leaves us with
+$\dot{B}(x,v) = v \leq \lambda x$. Again setting $\lambda = -1$ results in $v + x \leq 0$,
+which we've already proven is an invariant of the system (step 1).
+
+\section{Input constraint}
+Now we would like to add to our system the input constraint $u \geq \umin$
+for some constant $\umin < 0$. We have already imposed the input constraint
+$u \leq -2v-x$ in order to enforce $x \leq 0$. Thus, in order to make sure
+that there is always an available input satisfying both constraints, we
+need to maintain the invariant $-2v-x \geq \umin$. We can apply
+Theorem~\ref{thm:exp-barrier} using the barrier function $B(x,v) = \umin
++2v +x$. This results in the constraint $u \leq \frac{-\umin -3v -x}{2}$.
+
+\end{document}
