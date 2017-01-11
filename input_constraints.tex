@@ -29,30 +29,12 @@ Consider the following double integrator:
 \label{sys1}
 \end{align}
 
-where
-\[
-u \leq
-\begin{cases}
--\q(v - \sqrt{2\umin(-x + \frac{\umin}{2\p^2})}) - \frac{\umin v}{\sqrt{2\umin(-x + \frac{\umin}{2\p^2})}} & \text{if } x < \frac{\umin}{\p^2}\\
--(\q + \p) v -\q\p x & \text{otherwise}
-\end{cases}
-\]
+We want constraints on $u$ so that this system satisfies the state
+constraint $x \leq 0$ while obeying the input constraint $u \geq \umin$
+where $\umin < 0$, under some assumptions on the initial state.
 
-We want to prove that this system satisfies the state constraint $x \leq 0$
-while obeying the input constraint $u \geq \umin$ where $\umin < 0$, under
-the assumption that $x \leq 0$ and $B(x,v) \leq 0$ hold on the initial
-state, where
-
-\[B(x,v) =
-\begin{cases}
-v - \sqrt{2\umin(x - \frac{\umin}{2\p^2})} & \text{if } x < \frac{\umin}{\p^2}\\
-v + \p x & \text{otherwise}
-\end{cases}
-\]
-for some constant $\p > 0$.
-
-The proof is in the following section. Informally, the idea is that if the
-pilot demands infinite positive acceleration, the system behaves as our
+The formal details of a solution are below. Informally, the idea is that if
+the pilot demands infinite positive acceleration, the system behaves as our
 critically or over-damped linear system near the origin while issuing
 constant acceleration $\umin$ farther away from the origin. Constant
 acceleration implies a square root relationship between position and
@@ -62,7 +44,8 @@ linear near the origin and a square root farther away while having a smooth
 transition between the two. This is done by shifting the square root curve
 left until it is tangent to the linear constraint, as depicted in
 Figure~\ref{fig:sqrt-lin}. The shaded region in Figure~\ref{fig:sqrt-lin}
-depicts $B(x,v) \leq 0$.
+depicts the invariant we would like to enforce. The step from the invariant
+in Figure~\ref{fig:sqrt-lin} to $x \leq 0$ is relatively simple.
 
 \begin{figure}[H]
 \centering
@@ -81,13 +64,38 @@ depicts $B(x,v) \leq 0$.
       \draw[domain=0:2.5,smooth,variable=\v,red]  plot ({-\v*\v/2 - 1/2},{\v})
           node[left] at (-3.625,2.5) {$v \leq \sqrt{2\umin(x - \frac{\umin}{2\p^2})}$};
       \draw[domain=-2.5:2.5,smooth,variable=\x,blue]  plot ({\x},{-\x}) node[right] at (2.5,-2.5) {$v\leq -\p x$};
+      \draw[black,variable=\x,domain=-3:2.5,dashed] plot ({-1},{\x}) node[above] at (-1,2.5) {$x = \frac{\umin}{\p^2}$};
 \end{tikzpicture}
 \caption{A depiction of $B(x,v) \leq 0$ where the red curve represents the first branch of the piecewise function and blue the second.}
 \label{fig:sqrt-lin}
 \end{figure}
 
+Formally, the invariant is $B(x,v) \leq 0$, where
+\[B(x,v) =
+\begin{cases}
+v - \sqrt{2\umin(x - \frac{\umin}{2\p^2})} & \text{if } x < \frac{\umin}{\p^2}\\
+v + \p x & \text{otherwise}
+\end{cases}
+\]
+for some constant $\p > 0$.
+
+This induces the following constraints on $u$:
+\[
+u \leq
+\begin{cases}
+-\q(v - \sqrt{2\umin(-x + \frac{\umin}{2\p^2})}) - \frac{\umin v}{\sqrt{2\umin(-x + \frac{\umin}{2\p^2})}} & \text{if } x < \frac{\umin}{\p^2}\\
+-(\q + \p) v -\q\p x & \text{otherwise}
+\end{cases}
+\]
+
+In Section~\ref{sec:proof}, we will prove that this system satisfies the
+state constraint $x \leq 0$ while obeying the input constraint $u \geq
+\umin$ where $\umin < 0$, under the assumption that $x \leq 0$ and $B(x,v)
+\leq 0$ hold on the initial state.
+
 \section{Proof}
-This proof proceeds in two steps:
+\label{sec:proof}
+This proof proceeds in three steps:
 \begin{enumerate}
 \item Use the barrier function theorem to show that $B(x,v) \leq 0$ is an invariant of the system.
 \item Use the above invariant and another application of the barrier function theorem to show that $x \leq 0$ is an invariant of the system.
@@ -118,8 +126,9 @@ at least $\frac{|\umin|}{\p} > 0$, so that term is bounded.
 
 \paragraph*{Step 2}
 We apply the barrier function theorem with a barrier function $x$, which
-results in the constraint $v \leq -\p x$. Some algebra and the invariant
-from step 1 gives us $v + \p x \leq B(x,v) \leq 0$.
+results in the constraint $v \leq -\p x$. Some algebra shows that $v + \p x
+\leq B(x,v)$, which is easy to see from Figure~\ref{fig:sqrt-lin}. Since
+$B(x,v) \leq 0$, we know that $v + \p x \leq 0$.
 
 \paragraph*{Step 3}
 We need to show that both branches of the piecewise constraint on $u$ are
