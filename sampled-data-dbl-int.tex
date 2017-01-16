@@ -5,7 +5,7 @@
 
 \newtheorem{theorem}{Theorem}
 
-\title{Sampled-data double integrator}
+\title{State constraints for sampled-data systems}
 \author{Daniel Ricketts}
 
 \newcommand{\vecbold}[1]{\boldsymbol{#1}}
@@ -35,13 +35,13 @@ decompose this task into two pieces:
   function of both the current state and the last sampled state. Since
   we've proven that these two states are related in a certain way, we can
   assume that relation when proving the property about the time
-  derivative. In other words, we can assume that the intersample velocity
-  differs by at most $u_{max}\cdot T$ when reasoning about the time
-  derivative of $B$.
+  derivative. For the double integrator, we can assume that the intersample
+  velocity differs by at most $u_{max}\cdot T$ when reasoning about the
+  time derivative of $B$.
 \end{itemize}
 
 This intuition is formalized in Theorem~\ref{thm:exp-barrier-sampled}. In
-this theorem, I use the fact that $\dot{B}(\vecbold{x}) = \nabla B \bullet
+this theorem, we use the fact that $\dot{B}(\vecbold{x}) = \nabla B \bullet
 f(\vecbold{x},\vecbold{x_k})$. In the non-sampled data version of the
 theorem, it was not necessary to expand this definition. However, it is
 necessary here because we need to make explicit that the current state and
@@ -50,13 +50,49 @@ sampled state are related.
 \begin{theorem}
 If there exists a function $B \in \state \rightarrow \mathcal{R}$, some constant $\lambda \in \mathcal{R}$, and a state relation $S \subseteq \state \times \state$ such that
 \begin{align}
+\label{thm:exp-barrier-sampled:rel}
 \forall k \in \mathcal{N}, t \in [t_k, t_{k+1}) : (\vecbold{x}(t),\vecbold{x}(t_k)) \in S \\
+\label{thm:exp-barrier-sampled:dt}
 \forall (\vecbold{x}, \vecbold{x_k}) \in S : \nabla B \bullet f(\vecbold{x},\vecbold{x_k}) \leq \lambda B(\vecbold{x})
 \end{align}
 then the set $\{\vecbold{x} \in \mathcal{R}^n : B(\vecbold{x}) \leq 0\}$ is forward invariant.
 \label{thm:exp-barrier-sampled}
 \end{theorem}
 
+\section{Example: Single integrator}
+Consider the sampled data version of the single integrator:
+\[\dot{x}(t) = u(x(t_k)) \qquad \forall t \in [t_k, t_{k+1})\]
+where $x(t) \in \mathcal{R}$, $0 = t_0 < t_1 < \ldots < t_k < \ldots$ are
+the sampling instants, and $\forall k, t_{k+1} - t_k \leq T$ for some
+constant $T > 0$.
+
+We would like to prove that if $|u(x)| \leq u_{max}$ for some constant
+$u_{max} > 0$ and $u(x) \leq -\lambda(x + u_{max}\cdot T)$, then $x \leq 0$
+is forward invariant.
+
+\paragraph{Intersample behavior}
+First we find a state relation $S$ to characterize the intersample
+behavior. Using the bound $|u(x)| \leq u_{max}$ and the intersample time
+bound $T$, we can prove that the following relation bounds the difference
+between a state and the most recent sample:
+\[S = \{(x,x_k) : |x - x_k| \leq u_{max}\cdot T\}\]
+This satisfies condition~\ref{thm:exp-barrier-sampled:rel} of
+Theorem~\ref{thm:exp-barrier-sampled}.
+
+\paragraph{Time derivative of barrier function}
+Second, we need to prove condition~\ref{thm:exp-barrier-sampled:dt} of
+Theorem~\ref{thm:exp-barrier-sampled} for the barrier function $B(x) = x$:
+\[\nabla B \bullet f(\vecbold{x},\vecbold{x_k}) = u(x_k) \leq -\lambda x\]
+This follows from the fact that $u(x_k) \leq -\lambda(x_k + u_{max}\cdot
+T)$ and $(x,x_k) \in S$, i.e. $|x - x_k| \leq u_{max}\cdot T$.
+
+Note that this approach leads to conservative inputs for certain cases
+because the time derivative bound needs to hold over the entire sampling
+interval. For the single integrator, this is unnecessary - it would be
+sufficient for the input to violate this constraint at the end of the
+interval as long as it satisfies the constraint with some buffer at the
+beginning. However, if the dynamics of the system are slow relative to the
+sampling time, then this conservativeness should be acceptable.
 
 %% \section{Robust exponential barrier functions}
 %% This section will present a version of the exponential barrier function
