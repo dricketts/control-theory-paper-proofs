@@ -1,0 +1,105 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\newtheorem{theorem}{Theorem}
+
+\title{Sampled-data double integrator}
+\author{Daniel Ricketts}
+
+\newcommand{\vecbold}[1]{\boldsymbol{#1}}
+\newcommand{\umin}{u_{min}}
+\newcommand{\p}{\gamma}
+\newcommand{\q}{\alpha}
+\newcommand{\state}{\mathcal{R}^n}
+
+\begin{document}
+\maketitle
+
+\section{Exponential barrer functions for sampled-data systems}
+Consider a sampled-data system, modeled by:
+\[\dot{\vecbold{x}}(t) = f(\vecbold{x}(t),\vecbold{x}(t_k))\qquad\forall t \in [t_k, t_{k+1})\]
+where $\vecbold{x}(t) \in \state$ and $0 = t_0 < t_1 < \ldots < t_k < \ldots$ are the sampling instants.
+
+We would like to prove state invariants for this system. The idea is to
+decompose this task into two pieces:
+\begin{itemize}
+\item First, we prove that intersample states are related in some way to
+  the last sampled state. For example, in the double integrator, if we know
+  that $|u| \leq u_{max}$ and we know that samples are at most $T$ apart,
+  then the velocity of an intersample state differs by at most $u_{max}\cdot T$
+  from the last sampled velocity.
+\item Second, we prove, as before, that the time derivative of $B$ is at
+  most proportional to $B$. However, the time derivative of $B$ is a
+  function of both the current state and the last sampled state. Since
+  we've proven that these two states are related in a certain way, we can
+  assume that relation when proving the property about the time
+  derivative. In other words, we can assume that the intersample velocity
+  differs by at most $u_{max}\cdot T$ when reasoning about the time
+  derivative of $B$.
+\end{itemize}
+
+This intuition is formalized in Theorem~\ref{thm:exp-barrier-sampled}. In
+this theorem, I use the fact that $\dot{B}(\vecbold{x}) = \nabla B \bullet
+f(\vecbold{x},\vecbold{x_k})$. In the non-sampled data version of the
+theorem, it was not necessary to expand this definition. However, it is
+necessary here because we need to make explicit that the current state and
+sampled state are related.
+
+\begin{theorem}
+If there exists a function $B \in \state \rightarrow \mathcal{R}$, some constant $\lambda \in \mathcal{R}$, and a state relation $S \subseteq \state \times \state$ such that
+\begin{align}
+\forall k \in \mathcal{N}, t \in [t_k, t_{k+1}) : (\vecbold{x}(t),\vecbold{x}(t_k)) \in S \\
+\forall (\vecbold{x}, \vecbold{x_k}) \in S : \nabla B \bullet f(\vecbold{x},\vecbold{x_k}) \leq \lambda B(\vecbold{x})
+\end{align}
+then the set $\{\vecbold{x} \in \mathcal{R}^n : B(\vecbold{x}) \leq 0\}$ is forward invariant.
+\label{thm:exp-barrier-sampled}
+\end{theorem}
+
+
+%% \section{Robust exponential barrier functions}
+%% This section will present a version of the exponential barrier function
+%% theorem (Theorem~\ref{thm:exp-barrier-robust}) for systems under
+%% disturbances. The proof of that theorem will use the original barrier
+%% function theorem (Theorem~\ref{thm:exp-barrier}), so I present it here for
+%% reference:
+
+%% \begin{theorem}
+%% For a system of the form $\dot{\vecbold{x}} = f(\vecbold{x},t)$, if there exists a function $B \in \mathcal{R}^n \rightarrow \mathcal{R}$ and some constant $\lambda \in \mathcal{R}$ such that
+%% \[\dot{B}(\vecbold{x}) \leq \lambda B(\vecbold{x})\]
+%% then the set $\{\vecbold{x} \in \mathcal{R}^n : B(\vecbold{x}) \leq 0\}$ is forward invariant.
+%% \label{thm:exp-barrier}
+%% \end{theorem}
+
+%% Now consider a system of the form:
+%% \begin{align}
+%% \dot{\vecbold{x}} = f(\vecbold{x} + d(t))
+%% \label{eqn:sys}
+%% \end{align}
+%% where $x\in\mathcal{R}^n$ and $d \in \mathcal{R} \rightarrow \mathcal{R}^n$.
+
+%% \begin{theorem}
+%% If there exists a function $B \in \mathcal{R}^n \rightarrow \mathcal{R}$, a class-$\mathcal{K}$ function $\alpha$, and constants $\lambda, D \geq 0$ such that
+%% \begin{align}
+%% \forall \vecbold{x} \in \mathcal{R}^n : \dot{B}(\vecbold{x}) \leq -\lambda B(\vecbold{x}) \\
+%% \forall \vecbold{v}, \vecbold{w} \in \mathcal{R}^n : B(\vecbold{v} + \vecbold{w}) \geq B(\vecbold{v}) - \alpha(\|\vecbold{w}\|) \\
+%% \forall t \in R : \|d(t)\| \leq D
+%% \end{align}
+%% then the set $\{\vecbold{x} \in \mathcal{R}^n : B(\vecbold{x}) \leq \alpha(D)\}$ is forward invariant.
+%% \label{thm:exp-barrier-robust}
+%% \end{theorem}
+
+%% \begin{proof}
+%% \begin{align*}
+%% \frac{d[B(\vecbold{x}) - \alpha(D)]}{dt} &= \frac{dB(\vecbold{x})}{d\vecbold{x}}f(\vecbold{x} + d(t)) \\
+%%                                          &\leq -\lambda B(\vecbold{x} + d(t)) \\
+%%                                          &\leq -\lambda \left(B(\vecbold{x}) - \alpha(\|d(t)\|)\right) \\
+%%                                          &\leq -\lambda \left(B(\vecbold{x}) - \alpha(D)\right)
+%% \end{align*}
+%% By Theorem~\ref{thm:exp-barrier} with barrier function $B(\vecbold{x}) -
+%% \alpha(D)$, the above inequality implies that the set $\{\vecbold{x} \in
+%% \mathcal{R}^n : B(\vecbold{x}) - \alpha(D) \leq 0\}$ is forward invariant.
+%% \end{proof}
+
+\end{document}
